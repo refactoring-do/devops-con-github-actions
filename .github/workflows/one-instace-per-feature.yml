@@ -28,7 +28,7 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}
 
       - name: 'Deploy to Azure Container Instances'
-        uses: 'azure/aci-deploy@v1'
+        uses: 'azure/aci-deploy@v1.10.0'
         with:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
           dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
