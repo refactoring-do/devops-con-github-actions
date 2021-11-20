@@ -21,7 +21,7 @@ jobs:
 
       - name: Build n Push
         run: |
-          docker build -t ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }} .
+          docker build . -t ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
           docker push ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
 
       - name: 'Deploy to Azure Container Instances'
