@@ -1,0 +1,33 @@
+name: Deploy one instance per feature
+
+on:
+  push:
+    branches:
+      - "*feature*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@main
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: marluan/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
+          tag_with_ref: true
+
+      - name: "Deploy to Azure Container Instances"
+        uses: "azure/aci-deploy@v1"
+        with:
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+          image: marluan/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
+          name: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
+          location: "eastus2"
+
+      - name: Get instance url
+        run: echo "${{ steps.deploy.outputs.app-url }}"
