@@ -6,6 +6,13 @@ on:
       - '*feature*'
 
 jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get short sha
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -21,16 +28,16 @@ jobs:
 
       - name: Build n Push
         run: |
-          docker build . -t ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
-          docker push ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
+          docker build . -t ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ needs.versioning.outputs.sha_short }}
+          docker push ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ needs.versioning.outputs.sha_short }}
 
       - name: 'Deploy to Azure Container Instances'
         uses: 'azure/aci-deploy@v1'
         with:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
           dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-          image: ghcr.io/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
-          name: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}
+          image: ghcr.io/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ needs.versioning.outputs.sha_short }}
+          name: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ needs.versioning.outputs.sha_short }}
           location: 'eastus2'
 
       - name: Get instance url
