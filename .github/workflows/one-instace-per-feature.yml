@@ -24,7 +24,7 @@ jobs:
 
       - name: Build n Push
         run: |
-          docker build . -t ${{ env.IMAGE_NAME }} -f "./3. avanzado"
+          docker build . -t ${{ env.IMAGE_NAME }} -f "./3. avanzado/Dockerfile"
           docker push ${{ env.IMAGE_NAME }}
 
       - name: 'Deploy to Azure Container Instances'
